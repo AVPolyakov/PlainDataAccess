@@ -6,28 +6,25 @@ namespace PlainSql
 {
     public static partial class DbExecutorExtensions
     {
-        public static Task<IEnumerable<T>> QueryAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QueryAsync<T>(sql));
+        public static Task<T> SingleAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.SingleAsync<T>);
+
+        public static Task<T> SingleOrDefaultAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.SingleOrDefaultAsync<T>);
+
+        public static Task<T> FirstAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.FirstAsync<T>);
+
+        public static Task<T> FirstOrDefaultAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.FirstOrDefaultAsync<T>);
         
-        public static Task<T> QuerySingleAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QuerySingleAsync<T>(sql));
+        public static Task<List<T>> ToListAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.ToListAsync<T>);
 
-        public static Task<T> QuerySingleOrDefaultAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QuerySingleOrDefaultAsync<T>(sql));
+        public static Task<T[]> ToArrayAsync<T>(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.ToArrayAsync<T>);
 
-        public static Task<T> QueryFirst<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QueryFirstAsync<T>(sql));
-
-        public static Task<T> QueryFirstOrDefaultAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QueryFirstOrDefaultAsync<T>(sql));
-        
-        public static Task<List<T>> QueryListAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QueryListAsync<T>(sql));
-
-        public static Task<T[]> QueryArrayAsync<T>(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.QueryArrayAsync<T>(sql));
-
-        public static Task<int> ExecuteAsync(this IDbExecutor<IDbConnection> executor, Sql sql)
-            => executor.ExecuteAsync(connection => connection.ExecuteAsync(sql));
+        public static Task<int> ExecuteAsync(this Sql sql, IDbExecutor<IDbConnection> executor)
+            => executor.ExecuteAsync(sql.ExecuteAsync);
     }
 }

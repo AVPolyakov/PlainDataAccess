@@ -29,12 +29,12 @@ namespace PlainSql.SqlServer.Tests
         {
             var db = new DbExecutor(DefaultConnectionString);
             
-            await db.ExecuteAsync(new Sql(@$"
+            await new Sql(@$"
 IF EXISTS ( SELECT * FROM sys.databases WHERE name = '{DatabaseName}' )
     DROP DATABASE [{DatabaseName}]
 
 CREATE DATABASE [{DatabaseName}]
-"));
+").ExecuteAsync(db);
             
             var upgrader = DeployChanges.To
                 .SqlDatabase(ConnectionString)

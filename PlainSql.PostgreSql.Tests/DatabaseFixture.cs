@@ -31,15 +31,15 @@ namespace PlainSql.PostgreSql.Tests
         {
             var db = new DbExecutor(DefaultConnectionString);
 
-            var singleOrDefault = await db.QuerySingleOrDefaultAsync<string?>(new Sql(@$"
+            var singleOrDefault = await new Sql(@$"
 SELECT datname
 FROM pg_catalog.pg_database 
-WHERE datname = '{DatabaseName}'"));
+WHERE datname = '{DatabaseName}'").SingleOrDefaultAsync<string?>(db);
 
             if (singleOrDefault != null)
-                await db.ExecuteAsync(new Sql($"DROP DATABASE {DatabaseName}"));
+                await new Sql($"DROP DATABASE {DatabaseName}").ExecuteAsync(db);
 
-            await db.ExecuteAsync(new Sql($"CREATE DATABASE {DatabaseName}"));
+            await new Sql($"CREATE DATABASE {DatabaseName}").ExecuteAsync(db);
 
             var upgrader = DeployChanges.To
                 .PostgresqlDatabase(ConnectionString)

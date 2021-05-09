@@ -26,7 +26,7 @@ FROM Posts p
 WHERE p.CreationDate >= @date
 ORDER BY p.PostId", new {date});
 
-            var postInfos = await _db.QueryListAsync<PostInfo>(sql);
+            var postInfos = await sql.ToListAsync<PostInfo>(_db);
             
             Assert.Equal(2, postInfos.Count);
 
@@ -58,7 +58,7 @@ WHERE 1 = 1");
                 sql.Append(@"
     AND p.CreationDate >= @date", new {date});
 
-            return _db.QueryListAsync<PostInfo>(sql);
+            return sql.ToListAsync<PostInfo>(_db);
         }
         
         [Fact]
@@ -69,18 +69,18 @@ WHERE 1 = 1");
                 var post = new Post {CreationDate = new DateTime(2014, 1, 1)};
                 FillPost(post, new PostData {Text = "Test"});
                 id = await _db.InsertAsync<int>(post);
-                Assert.Equal("Test", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id})));
+                Assert.Equal("Test", await new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id}).SingleAsync<string>(_db));
             }
             {
                 var post = await _db.GetByKeyAsync<Post>(new {PostId = id});
                 FillPost(post, new PostData {Text = "Test2"});
                 await _db.UpdateAsync(post);
-                Assert.Equal("Test2", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id})));
+                Assert.Equal("Test2", await new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id}).SingleAsync<string>(_db));
             }
             {
                 var rowCount = await _db.DeleteAsync<Post>(new {PostId = id});
                 Assert.Equal(1, rowCount);
-                Assert.Empty(await _db.QueryListAsync<string>(new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id})));
+                Assert.Empty(await new Sql("SELECT Text FROM Posts WHERE PostId = @id", new {id}).ToListAsync<string>(_db));
             }
         }
         
@@ -101,7 +101,7 @@ FROM ({Post(sql)}) p
 WHERE p.CreationDate <= @toDate
 ORDER BY p.PostId", new {toDate});
 
-            var postInfos = await _db.QueryListAsync<PostInfo>(sql);
+            var postInfos = await sql.ToListAsync<PostInfo>(_db);
             
             Assert.Equal(2, postInfos.Count);
         }
@@ -124,14 +124,14 @@ WHERE p.CreationDate >= @fromDate
             {
                 var entity = new Table2{Text = "Test"};
                 id = await _db.InsertAsync<int>(entity);
-                Assert.Equal("Test", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Table2s WHERE Id = @id", new {id})));
+                Assert.Equal("Test", await new Sql("SELECT Text FROM Table2s WHERE Id = @id", new {id}).SingleAsync<string>(_db));
             }
             {
                 var entity = await _db.GetByKeyAsync<Table2>(new {Id = id});  
                 Assert.Equal(1, entity.ReadOnlyColumn1);
                 entity.Text = "Test2";
                 await _db.UpdateAsync(entity);
-                Assert.Equal("Test2", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Table2s WHERE Id = @id", new {id})));
+                Assert.Equal("Test2", await new Sql("SELECT Text FROM Table2s WHERE Id = @id", new {id}).SingleAsync<string>(_db));
             }
         }
         
@@ -142,13 +142,13 @@ WHERE p.CreationDate >= @fromDate
             {
                 var entity = new Comment{Text = "Test"};
                 id = await _db.InsertAsync<int>(entity);
-                Assert.Equal("Test", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Comment2s WHERE Id = @id", new {id})));
+                Assert.Equal("Test", await new Sql("SELECT Text FROM Comment2s WHERE Id = @id", new {id}).SingleAsync<string>(_db));
             }
             {
                 var entity = await _db.GetByKeyAsync<Comment>(new {Id = id});
                 entity.Text = "Test2";
                 await _db.UpdateAsync(entity);
-                Assert.Equal("Test2", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Comment2s WHERE Id = @id", new {id})));
+                Assert.Equal("Test2", await new Sql("SELECT Text FROM Comment2s WHERE Id = @id", new {id}).SingleAsync<string>(_db));
             }
         }
         
@@ -158,7 +158,7 @@ WHERE p.CreationDate >= @fromDate
             var id = 5;
             var entity = new Table3 {Id = id, Text = "Test"};
             await _db.InsertAsync(entity);
-            Assert.Equal("Test", await _db.QuerySingleAsync<string>(new Sql("SELECT Text FROM Table3s WHERE Id = @id", new {id})));
+            Assert.Equal("Test", await new Sql("SELECT Text FROM Table3s WHERE Id = @id", new {id}).SingleAsync<string>(_db));
 
             var rowCount = await _db.DeleteAsync<Table3>(new {Id = id});
             Assert.Equal(1, rowCount);
@@ -181,7 +181,7 @@ FROM @Customers",
                 {
                     Customers = dataTable.AsTableValuedParameter("TVP_Customer")
                 });
-            var customers = await _db.QueryListAsync<Customer>(sql);
+            var customers = await sql.ToListAsync<Customer>(_db);
             Assert.Equal(5, customers.Count);
             Assert.Equal("Code_4", customers[4].Code);
         }

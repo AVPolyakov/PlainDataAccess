@@ -17,7 +17,7 @@ namespace PlainSql.SqlServer.Tests
             var sql = new Sql("SELECT p.PostId, p.Text, p.CreationDate FROM Posts p");
 
             var exception = await Assert.ThrowsAsync<Exception>(
-                () => _db.QueryListAsync<PostInfo2>(sql));
+                () => sql.ToListAsync<PostInfo2>(_db));
 
             Assert.Equal(@"Property 'PostId' not found in destination type. You can copy list of properties to destination type PlainSql.SqlServer.Tests.PostInfo2:
         public int PostId { get; set; }
@@ -32,7 +32,7 @@ namespace PlainSql.SqlServer.Tests
             var sql = new Sql("SELECT p.PostId, p.Text, p.CreationDate FROM Posts p");
 
             var exception = await Assert.ThrowsAsync<Exception>(
-                () => _db.QueryListAsync<PostInfo3>(sql));
+                () => sql.ToListAsync<PostInfo3>(_db));
 
             Assert.Equal(@"Type of field 'PostId' does not match. Field type is 'long' in destination and `int` in query. You can copy list of properties to destination type PlainSql.SqlServer.Tests.PostInfo3:
         public int PostId { get; set; }
@@ -47,7 +47,7 @@ namespace PlainSql.SqlServer.Tests
             var sql = new Sql("SELECT * FROM Table5s");
 
             var exception = await Assert.ThrowsAsync<Exception>(
-                () => _db.QueryListAsync<Table5Info>(sql));
+                () => sql.ToListAsync<Table5Info>(_db));
 
             Assert.Equal(@"Type of field 'CreationDate' does not match. Field type is 'DateTime' in destination and `DateTime?` in query. You can copy list of properties to destination type PlainSql.SqlServer.Tests.Table5Info:
         public int Id { get; set; }
@@ -60,7 +60,7 @@ namespace PlainSql.SqlServer.Tests
         {
             var sql = new Sql("SELECT p.PostId, p.Text, p.CreationDate FROM Posts p");
 
-            var list = await _db.QueryListAsync<PostInfo4>(sql);
+            var list = await sql.ToListAsync<PostInfo4>(_db);
             
             Assert.NotNull(list);
         }

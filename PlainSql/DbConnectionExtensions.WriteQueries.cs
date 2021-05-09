@@ -33,7 +33,7 @@ namespace PlainSql
             
             var sql = new Sql(sqlText, param);
             
-            return await connection.QuerySingleAsync<TKey>(sql);
+            return await sql.SingleAsync<TKey>(connection);
         }
         
         public static async Task<int> InsertAsync(this IDbConnection connection, object param)
@@ -54,7 +54,7 @@ namespace PlainSql
 INSERT INTO {table} ({columnsClause}) 
 VALUES ({valuesClause})", param);
             
-            return await connection.ExecuteAsync(sql);
+            return await sql.ExecuteAsync(connection);
         }
         
         public static async Task<int> UpdateAsync(this IDbConnection connection, object param)
@@ -77,7 +77,7 @@ UPDATE {table}
 SET {setClause}
 WHERE {whereClause}", param);
             
-            return await connection.ExecuteAsync(sql);
+            return await sql.ExecuteAsync(connection);
         }
 
         public static async Task<int> DeleteAsync<T>(this IDbConnection connection, object param)
@@ -94,7 +94,7 @@ WHERE {whereClause}", param);
 DELETE FROM {tableName}
 WHERE {whereClause}", param);
             
-            return await connection.ExecuteAsync(sql);
+            return await sql.ExecuteAsync(connection);
         }
         
         public static async Task<T> GetByKeyAsync<T>(this IDbConnection connection, object param)
@@ -115,7 +115,7 @@ SELECT {selectClause}
 FROM {tableName}
 WHERE {whereClause}", param);
             
-            return await connection.QuerySingleAsync<T>(sql);
+            return await sql.SingleAsync<T>(connection);
         }
 
         private static string EscapedName(this string name) => ISqlAdapter.Current.EscapedName(name);
